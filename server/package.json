@@ -17,7 +17,8 @@
     "express": "^4.17.1",
     "graphql": "^15.4.0",
     "knex": "^0.21.16",
-    "objection": "^2.2.11"
+    "objection": "^2.2.11",
+    "pg": "^8.5.1"
   },
   "devDependencies": {
     "nodemon": "^2.0.7"
