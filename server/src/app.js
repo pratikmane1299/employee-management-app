@@ -1,21 +1,31 @@
-require('dotenv').config()
+require("dotenv").config();
 const express = require("express");
 const { ApolloServer } = require("apollo-server-express");
 
-const typeDefs = require('./schema');
-const resolvers = require('./resolvers');
+const knex = require("./db");
+const typeDefs = require("./schema");
+const resolvers = require("./resolvers");
 
-const port = process.env.PORT || 3131;
+async function main() {
+  const port = process.env.PORT || 3131;
+  const app = express();
 
-const app = express();
+  const graphqlServer = new ApolloServer({
+    typeDefs,
+    resolvers,
+  });
 
-const graphqlServer = new ApolloServer({
-  typeDefs,
-  resolvers,
-});
+  await knex.migrate.latest();
 
-graphqlServer.applyMiddleware({ app });
+  await knex.seed.run();
 
-app.listen(port, () =>
-  console.log(`graphql server running on http://localhost:${port}${graphqlServer.graphqlPath}`)
-);
+  graphqlServer.applyMiddleware({ app });
+
+  app.listen(port, () =>
+    console.log(
+      `graphql server running on http://localhost:${port}${graphqlServer.graphqlPath}`
+    )
+  );
+}
+
+main();
