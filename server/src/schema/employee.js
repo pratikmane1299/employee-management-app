@@ -1,6 +1,10 @@
 const { gql } = require('apollo-server');
 
 const employeeSchema = gql`
+  extend type Query {
+    listEmployees: [Employee!]!
+  }
+
   enum Gender {
     MALE
     FEMALE

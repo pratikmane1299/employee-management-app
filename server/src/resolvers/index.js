@@ -1,8 +1,6 @@
+const employeeResolver = require('./employee');
+
 const resolvers = {
-  Gender: {
-    MALE: 'male',
-    FEMALE: 'female',
-  },
   Query: {
     helloWorld: (_, __, ___) => {
       return 'Hello World !!!';
@@ -10,4 +8,4 @@ const resolvers = {
   }
 }
 
-module.exports = resolvers;
+module.exports = [ resolvers, employeeResolver ];

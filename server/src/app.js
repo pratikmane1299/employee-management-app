@@ -5,6 +5,7 @@ const { ApolloServer } = require("apollo-server-express");
 const knex = require("./db");
 const typeDefs = require("./schema");
 const resolvers = require("./resolvers");
+const { Employee } = require('./models');
 
 async function main() {
   const port = process.env.PORT || 3131;
@@ -13,6 +14,9 @@ async function main() {
   const graphqlServer = new ApolloServer({
     typeDefs,
     resolvers,
+    context: {
+      Employee
+    }
   });
 
   await knex.migrate.latest();
