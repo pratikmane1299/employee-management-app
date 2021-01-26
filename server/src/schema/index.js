@@ -6,6 +6,10 @@ const schema = gql`
   type Query {
     helloWorld: String!
   }
+
+  type Mutation {
+    _: Boolean
+  }
 `;
 
 module.exports = [ schema, employeeSchema ];

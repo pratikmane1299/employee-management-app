@@ -8,6 +8,14 @@ const employeeResolver = {
       return await Employee.query()
         .select('*');
     }
+  },
+  Mutation: {
+    createEmployee: async (_, { employee }, { Employee }) => {
+      const newEmployee = await Employee.query()
+        .insert(employee);
+
+      return newEmployee;
+    }
   }
 }
 
