@@ -7,6 +7,7 @@ const employeeSchema = gql`
 
   extend type Mutation {
     createEmployee(employee: EmployeeInput): Employee 
+    updateEmployee(employeeId: ID!, employee: EmployeeInput): Employee
   }
 
   input EmployeeInput {

@@ -15,6 +15,13 @@ const employeeResolver = {
         .insert(employee);
 
       return newEmployee;
+    },
+    updateEmployee: async (_, { employeeId, employee }, { Employee }) => {
+      const updatedEmployee = await Employee.query()
+        .patch(employee)
+        .findById(employeeId)
+        .returning('*');
+      return updatedEmployee;
     }
   }
 }
