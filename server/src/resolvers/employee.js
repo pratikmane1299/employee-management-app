@@ -22,6 +22,13 @@ const employeeResolver = {
         .findById(employeeId)
         .returning('*');
       return updatedEmployee;
+    },
+    deleteEmployee: async (_, { employeeId }, { Employee }) => {
+      const deletedEmployee = await Employee.query()
+        .deleteById(employeeId)
+        .returning('*');
+
+      return deletedEmployee;
     }
   }
 }
