@@ -36,3 +36,32 @@
     transform: rotate(360deg);
   }
 }
+
+.user-profile-container {
+  display: inline-block;
+}
+
+.profile-image-container {
+  display: inline-block;
+  position: relative;
+  width: 60px;
+  height: 60px;
+  overflow: hidden;
+  border-radius: 50%;
+  border: 1px solid #cccccc;
+}
+
+.profile-image-container > img {
+  width: 100%;
+  height: 100%;
+}
+
+.table > thead th {
+  font-size: 1.001rem;
+  text-transform: uppercase;
+}
+
+.table > tbody td {
+  vertical-align: middle;
+  font-size: 1rem;
+}
