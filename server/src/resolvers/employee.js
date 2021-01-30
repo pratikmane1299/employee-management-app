@@ -7,6 +7,11 @@ const employeeResolver = {
     listEmployees: async (_, args, { Employee }) => {
       return await Employee.query()
         .select('*');
+    },
+    getEmployee: async (_, { employeeId }, { Employee }) => {
+      return await Employee.query()
+        .select('*')
+        .findById(employeeId);
     }
   },
   Mutation: {

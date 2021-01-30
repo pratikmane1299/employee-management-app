@@ -3,6 +3,7 @@ const { gql } = require('apollo-server');
 const employeeSchema = gql`
   extend type Query {
     listEmployees: [Employee!]!
+    getEmployee(employeeId: ID!): Employee!
   }
 
   extend type Mutation {
