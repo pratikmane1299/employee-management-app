@@ -1,4 +1,4 @@
-function Header() {
+function Header({ onAddEmployee }) {
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
       <div className="container">
@@ -8,7 +8,7 @@ function Header() {
 
         <div className="collapse navbar-collapse" id="navbarColor01">
           <div className="ml-auto">
-            <button className="btn btn-primary">Add Employee</button>
+            <button className="btn btn-primary" onClick={onAddEmployee}>Add Employee</button>
           </div>
         </div>
       </div>
