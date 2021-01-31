@@ -33,3 +33,20 @@ export const UPDATE_EMPLOYEE = gql`
     }
   }
 `;
+
+export const DELETE_EMPLOYEE = gql`
+  mutation DeleteEmployee($employeeId: ID!) {
+    deleteEmployee(employeeId: $employeeId) {
+      id
+      first_name
+      last_name
+      image_url
+      email
+      mobile
+      gender
+      job_profile
+      department
+      salary
+    }
+  }
+`;

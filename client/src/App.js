@@ -15,7 +15,7 @@ import Radio from './components/Radio';
 import Select from './components/Select';
 
 import { LIST_EMPLOYEES, GET_EMPLOYEE } from './graphql/queries';
-import { CREATE_EMPLOYEE, UPDATE_EMPLOYEE } from './graphql/mutations';
+import { CREATE_EMPLOYEE, UPDATE_EMPLOYEE, DELETE_EMPLOYEE } from './graphql/mutations';
 
 import { departments, jobTitles } from './constants';
 
@@ -71,6 +71,21 @@ function App() {
       });
     }
   });
+
+  const [deleteEmployee] = useMutation(DELETE_EMPLOYEE, {
+    update(cache, {data: { deleteEmployee }}) {
+      const { listEmployees } = cache.readQuery({ query: LIST_EMPLOYEES });
+
+      const newEmployeeList = listEmployees.filter(employee => employee.id !== deleteEmployee.id);
+
+      cache.writeQuery({
+        query: LIST_EMPLOYEES,
+        data: {
+          listEmployees: newEmployeeList,
+        },
+      });
+    }
+  });
   
   const { register, handleSubmit, errors, reset, setValue } = useForm({
     resolver: yupResolver(schema)
@@ -108,6 +123,10 @@ function App() {
     setMode('edit');
     setShowModal(true);
   }
+
+  const handleOnDelete = (id) => {
+    deleteEmployee({ variables: { employeeId: id } });
+  } 
 
   const onModalClose = () => {
     reset();
@@ -179,7 +198,10 @@ function App() {
                         <FontAwesomeIcon icon={faPen} />
                       </button>
                       <button className="btn btn-danger btn-sm ml-1">
-                        <FontAwesomeIcon icon={faTrashAlt} />
+                        <FontAwesomeIcon icon={faTrashAlt} onClick={(e) => {
+                          e.preventDefault();
+                          handleOnDelete(id);
+                        }} />
                       </button>
                     </td>
                   </tr>
