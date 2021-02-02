@@ -22,5 +22,24 @@ services:
     links:
       - db
 
+  api:
+    image: employee-mgmnt-graphql-server
+    build: .
+    container_name: employee-mgmnt-graphql-server
+    restart: always
+    ports:
+      - ${PORT}:${PORT}
+    environment:
+      PORT: ${PORT}
+      DB_PORT: ${DB_PORT}
+      DB_HOST: ${DB_HOST}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    depends_on:
+      - db
+    volumes:
+      - .:/usr/src/app
+
 volumes:
   employee-mgmnt-db:
