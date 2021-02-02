@@ -36,3 +36,7 @@ A fullstack application build with react, apollo graphql and postgresql.
     cd client
     npm start
   ```
+
+# License
+
+The project is licensed under the MIT license. Read [license](./LICENSE) for more information.
