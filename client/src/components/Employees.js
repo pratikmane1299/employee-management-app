@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { useQuery, useMutation, useLazyQuery } from '@apollo/client';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -13,6 +14,7 @@ import Modal from './Modal';
 import Input from './Input';
 import Radio from './Radio';
 import Select from './Select';
+import Pagination from './Pagination';
 
 import { LIST_EMPLOYEES, GET_EMPLOYEE } from '../graphql/queries';
 import { CREATE_EMPLOYEE, UPDATE_EMPLOYEE, DELETE_EMPLOYEE } from '../graphql/mutations';
@@ -39,7 +41,12 @@ const schema = yup.object().shape({
 
 function Employees() {
 
-  const { loading, data } = useQuery(LIST_EMPLOYEES);
+  const searchParams = new URLSearchParams(useLocation().search);
+
+  const currentPage = searchParams.get('page') ? Number(searchParams.get('page')) : 1;
+  const pageSize = 10;
+
+  const { loading, data } = useQuery(LIST_EMPLOYEES, { variables: {page: currentPage, pageSize}, fetchPolicy: 'cache-and-network' });
 
   const [ getEmployee, { data: empResponse, loading: loadingEmployee } ] = useLazyQuery(GET_EMPLOYEE);
 
@@ -50,7 +57,10 @@ function Employees() {
       cache.writeQuery({
         query: LIST_EMPLOYEES,
         data: { 
-          listEmployees: [...listEmployees.employees, newEmployee],
+          listEmployees: {
+            employees: [...listEmployees.employees, newEmployee],
+            total: listEmployees.total
+          },
         },
       });
     }
@@ -85,7 +95,8 @@ function Employees() {
         query: LIST_EMPLOYEES,
         data: {
           listEmployees: {
-            employees: listEmployees.employees.filter(employee => employee.id !== deleteEmployee.id)
+            employees: listEmployees.employees.filter(employee => employee.id !== deleteEmployee.id),
+            total: listEmployees.total - 1
           },
         },
       });
@@ -150,73 +161,139 @@ function Employees() {
         {loading ? (
           <p>loading...</p>
         ) : (
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Mobile</th>
-                <th>Gender</th>
-                <th>Profile</th>
-                <th>Department</th>
-                <th>Salary</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.employees.map(
-                ({
-                  id,
-                  first_name,
-                  last_name,
-                  email,
-                  image_url,
-                  gender,
-                  mobile,
-                  department,
-                  job_profile,
-                  salary,
-                }) => (
-                  <tr key={id}>
-                    <td>
-                      <div className="d-inline-flex align-items-center">
-                        <div className="profile-image-container">
-                          <img src={image_url} alt={first_name} />
+          <>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Mobile</th>
+                  <th>Gender</th>
+                  <th>Profile</th>
+                  <th>Department</th>
+                  <th>Salary</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.listEmployees.employees.map(
+                  ({
+                    id,
+                    first_name,
+                    last_name,
+                    email,
+                    image_url,
+                    gender,
+                    mobile,
+                    department,
+                    job_profile,
+                    salary,
+                  }) => (
+                    <tr key={id}>
+                      <td>
+                        <div className="d-inline-flex align-items-center">
+                          <div className="profile-image-container">
+                            <img src={image_url} alt={first_name} />
+                          </div>
+                          <h6 className="ml-2">{`${first_name} ${last_name}`}</h6>
                         </div>
-                        <h6 className="ml-2">{`${first_name} ${last_name}`}</h6>
-                      </div>
-                    </td>
-                    <td>{email}</td>
-                    <td>{mobile}</td>
-                    <td>{gender}</td>
-                    <td>{job_profile}</td>
-                    <td>{department}</td>
-                    <td>&#8377; {salary}</td>
-                    <td>
-                      <button
-                        className="btn btn-success btn-sm mr-1"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleOnEdit(id);
-                        }}
-                      >
-                        <FontAwesomeIcon icon={faPen} />
-                      </button>
-                      <button className="btn btn-danger btn-sm ml-1">
-                        <FontAwesomeIcon
-                          icon={faTrashAlt}
+                      </td>
+                      <td>{email}</td>
+                      <td>{mobile}</td>
+                      <td>{gender}</td>
+                      <td>{job_profile}</td>
+                      <td>{department}</td>
+                      <td>&#8377; {salary}</td>
+                      <td>
+                        <button
+                          className="btn btn-success btn-sm mr-1"
                           onClick={(e) => {
                             e.preventDefault();
-                            handleOnDelete(id);
+                            handleOnEdit(id);
                           }}
-                        />
-                      </button>
-                    </td>
-                  </tr>
-                )
+                        >
+                          <FontAwesomeIcon icon={faPen} />
+                        </button>
+                        <button className="btn btn-danger btn-sm ml-1">
+                          <FontAwesomeIcon
+                            icon={faTrashAlt}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleOnDelete(id);
+                            }}
+                          />
+                        </button>
+                      </td>
+                    </tr>
+                  )
+                )}
+              </tbody>
+            </table>
+            <Pagination
+              className="pagination-wrapper"
+              currentPage={currentPage}
+              pageSize={pageSize}
+              totalItems={data.listEmployees.total}
+            >
+              {({
+                pages,
+                previousPage,
+                nextPage,
+                hasPreviousPage,
+                hasNextPage,
+                totalPages,
+              }) => (
+                <ul className="pagination">
+                  <li className="pagination-meta">
+                    Page {currentPage} of {totalPages}
+                  </li>
+                  {hasPreviousPage && (
+                    <>
+                      <li className="page-item pagination-first">
+                        <Link className="page-link" to={`/?page=1`}>
+                          First
+                        </Link>
+                      </li>
+                      <li className="page-item pagination-prev">
+                        <Link
+                          className="page-link"
+                          to={`/?page=${previousPage}`}
+                        >
+                          &#8592;&nbsp;Previous
+                        </Link>
+                      </li>
+                    </>
+                  )}
+                  {pages.map((page) => (
+                    <li
+                      key={page}
+                      className={
+                        currentPage === page ? "page-item active" : "page-item"
+                      }
+                    >
+                      <Link className="page-link" to={`/?page=${page}`}>
+                        {page}
+                      </Link>
+                    </li>
+                  ))}
+                  {hasNextPage && (
+                    <>
+                      <li className="page-item pagination-first">
+                        <Link className="page-link" to={`/?page=${nextPage}`}>
+                          Next&nbsp;&#8594;
+                        </Link>
+                      </li>
+                      <li className="page-item pagination-prev">
+                        <Link className="page-link" to={`/?page=${totalPages}`}>
+                          Last
+                        </Link>
+                      </li>
+                    </>
+                  )}
+                </ul>
               )}
-            </tbody>
-          </table>
+            </Pagination>
+          </>
         )}
         {loadingEmployee ? (
           <h1>loading...</h1>

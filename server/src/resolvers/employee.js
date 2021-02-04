@@ -4,9 +4,13 @@ const employeeResolver = {
     FEMALE: 'female',
   },
   Query: {
-    listEmployees: async (_, args, { Employee }) => {
-      return await Employee.query()
-        .select('*');
+    listEmployees: async (_, { page = 1, pageSize = 10 }, { Employee }) => {
+
+      const response = await Employee.query()
+        .select('*')
+        .page(page - 1, pageSize);
+      
+      return { employees: response.results, total: response.total }
     },
     getEmployee: async (_, { employeeId }, { Employee }) => {
       return await Employee.query()
