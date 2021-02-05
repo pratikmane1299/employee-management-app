@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useHistory, useLocation } from 'react-router-dom';
 import { useQuery, useMutation, useLazyQuery } from '@apollo/client';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPen, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
+import { faPen, faTrashAlt, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 
 import '../App.css';
 
@@ -20,6 +20,7 @@ import { LIST_EMPLOYEES, GET_EMPLOYEE } from '../graphql/queries';
 import { CREATE_EMPLOYEE, UPDATE_EMPLOYEE, DELETE_EMPLOYEE } from '../graphql/mutations';
 
 import { departments, jobTitles } from '../constants';
+import SearchBox from './SearchBox';
 
 const schema = yup.object().shape({
   first_name: yup.string().required("First Name is required"),
@@ -40,13 +41,16 @@ const schema = yup.object().shape({
 });
 
 function Employees() {
+  const history = useHistory();
 
   const searchParams = new URLSearchParams(useLocation().search);
+
+  const q = searchParams.get('q') ? searchParams.get('q') : '';
 
   const currentPage = searchParams.get('page') ? Number(searchParams.get('page')) : 1;
   const pageSize = 10;
 
-  const { loading, data } = useQuery(LIST_EMPLOYEES, { variables: {page: currentPage, pageSize}, fetchPolicy: 'cache-and-network' });
+  const { loading, data } = useQuery(LIST_EMPLOYEES, { variables: {page: currentPage, pageSize, filter: q}, fetchPolicy: 'cache-and-network' });
 
   const [ getEmployee, { data: empResponse, loading: loadingEmployee } ] = useLazyQuery(GET_EMPLOYEE);
 
@@ -108,6 +112,7 @@ function Employees() {
   });
   const [showModal, setShowModal] = useState(false);
   const [mode, setMode] = useState('add')
+  const [query, setQuery] = useState('');
 
   useEffect(() => {
     if (empResponse?.getEmployee) {
@@ -122,6 +127,15 @@ function Employees() {
       setValue('salary', empResponse?.getEmployee.salary);
     }
   }, [empResponse?.getEmployee, setValue])
+
+  useEffect(() => {
+    if (query !== '') {
+      searchParams.append('q', query);
+    } else {
+      searchParams.delete('q');
+    }
+    history.replace({search: searchParams.toString() });
+  }, [query, history]);
 
   const onSubmit = async (data) => {
     if (empResponse?.getEmployee) {
@@ -162,7 +176,25 @@ function Employees() {
           <p>loading...</p>
         ) : (
           <>
-            <table className="table">
+            <SearchBox
+              name="query"
+              placeholder="Search Employees..."
+              value={query}
+              onChange={(value) => setQuery(value)}
+            />
+            {query !== "" && (
+              <div className="mt-4 d-flex justify-content-between align-items-center border-secondary border-top border-bottom p-2">
+                <span >Found <strong>{data.listEmployees.total}</strong> employees matching {query}</span>
+                <button className="btn text-primary" onClick={(e) => {
+                  e.preventDefault();
+                  setQuery('');
+                }}>
+                  <span><FontAwesomeIcon icon={faTimesCircle} /></span>
+                  clear filter
+                </button>
+              </div>
+            )}
+            <table className="table mt-4">
               <thead>
                 <tr>
                   <th>Name</th>
@@ -250,14 +282,25 @@ function Employees() {
                   {hasPreviousPage && (
                     <>
                       <li className="page-item pagination-first">
-                        <Link className="page-link" to={`/?page=1`}>
+                        <Link
+                          className="page-link"
+                          to={{
+                            pathname: "/",
+                            search: query ? `page=1&q=${query}` : "page=1",
+                          }}
+                        >
                           First
                         </Link>
                       </li>
                       <li className="page-item pagination-prev">
                         <Link
                           className="page-link"
-                          to={`/?page=${previousPage}`}
+                          to={{
+                            pathname: "/",
+                            search: query
+                              ? `page=${previousPage}&q=${query}`
+                              : `page=${previousPage}`,
+                          }}
                         >
                           &#8592;&nbsp;Previous
                         </Link>
@@ -271,7 +314,15 @@ function Employees() {
                         currentPage === page ? "page-item active" : "page-item"
                       }
                     >
-                      <Link className="page-link" to={`/?page=${page}`}>
+                      <Link
+                        className="page-link"
+                        to={{
+                          pathname: "/",
+                          search: query
+                            ? `page=${page}&q=${query}`
+                            : `page=${page}`,
+                        }}
+                      >
                         {page}
                       </Link>
                     </li>
@@ -279,12 +330,28 @@ function Employees() {
                   {hasNextPage && (
                     <>
                       <li className="page-item pagination-first">
-                        <Link className="page-link" to={`/?page=${nextPage}`}>
+                        <Link
+                          className="page-link"
+                          to={{
+                            pathname: "/",
+                            search: query
+                              ? `page=${nextPage}&q=${query}`
+                              : `page=${nextPage}`,
+                          }}
+                        >
                           Next&nbsp;&#8594;
                         </Link>
                       </li>
                       <li className="page-item pagination-prev">
-                        <Link className="page-link" to={`/?page=${totalPages}`}>
+                        <Link
+                          className="page-link"
+                          to={{
+                            pathname: "/",
+                            search: query
+                              ? `page=${totalPages}&q=${query}`
+                              : `page=${totalPages}`,
+                          }}
+                        >
                           Last
                         </Link>
                       </li>

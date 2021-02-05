@@ -2,7 +2,7 @@ const { gql } = require('apollo-server');
 
 const employeeSchema = gql`
   extend type Query {
-    listEmployees(page: Int, pageSize: Int): ListEmployees!
+    listEmployees(page: Int, pageSize: Int, filter: String): ListEmployees!
     getEmployee(employeeId: ID!): Employee!
   }
 

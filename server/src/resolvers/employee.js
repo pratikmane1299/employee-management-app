@@ -4,11 +4,19 @@ const employeeResolver = {
     FEMALE: 'female',
   },
   Query: {
-    listEmployees: async (_, { page = 1, pageSize = 10 }, { Employee }) => {
+    listEmployees: async (_, { page = 1, pageSize = 10, filter }, { Employee }) => {
 
       const response = await Employee.query()
         .select('*')
+        .where((builder) => {
+          if (filter && filter !== '')
+            builder
+              .where('first_name', 'like', `%${filter}%`)
+              .orWhere('last_name', 'like', `%${filter}%`);
+        })
         .page(page - 1, pageSize);
+
+        console.log(response);
       
       return { employees: response.results, total: response.total }
     },
