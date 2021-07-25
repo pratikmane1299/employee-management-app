@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { request } from 'graphql-request';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen, faTrashAlt, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
+import { toast } from 'react-toastify';
 
 import '../App.css';
 
@@ -108,6 +109,7 @@ function Employees() {
       setTimeout(() => {
         if (!addEmployeeMutation.isLoading) {
           onModalClose();
+          toast('Employee created', { type: toast.TYPE.SUCCESS });
         }
       }, 2000);
     } else {
@@ -115,6 +117,7 @@ function Employees() {
       setTimeout(() => {
         if (!updateMutation.isLoading) {
           onModalClose();
+          toast('Employee updated', { type: toast.TYPE.SUCCESS });
         }
       }, 2000);
     }
@@ -122,6 +125,7 @@ function Employees() {
 
   const handleOnDelete = (employeeId) => {
     deleteMutation.mutate(employeeId);
+    toast('Employee deleted', { type: toast.TYPE.SUCCESS });
   }
 
   return (

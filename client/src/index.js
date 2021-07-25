@@ -1,11 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter as Router } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from 'react-query';
+import { ToastContainer } from 'react-toastify';
+
+import App from './App';
 
 import 'bootswatch/dist/journal/bootstrap.min.css';
+import 'react-toastify/dist/ReactToastify.css';
 import './index.css';
-import App from './App';
 import reportWebVitals from './reportWebVitals';
 
 const queryClient = new QueryClient();
@@ -13,9 +15,17 @@ const queryClient = new QueryClient();
 ReactDOM.render(
   <QueryClientProvider client={queryClient}>
     <React.StrictMode>
-      <Router>
-        <App />
-      </Router>
+      <App />
+      <ToastContainer
+        autoClose={3000}
+        draggable={false}
+        position="top-right"
+        closeOnClick
+        rtl={false}
+        hideProgressBar={false}
+        pauseOnFocusLoss
+        pauseOnHover
+      ></ToastContainer>
     </React.StrictMode>
   </QueryClientProvider>,
   document.getElementById("root")
