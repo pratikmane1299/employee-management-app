@@ -15,8 +15,6 @@ const employeeResolver = {
               .orWhere('last_name', 'like', `%${filter}%`);
         })
         .page(page - 1, pageSize);
-
-        console.log(response);
       
       return { employees: response.results, total: response.total }
     },
