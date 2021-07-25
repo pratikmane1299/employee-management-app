@@ -1,9 +1,8 @@
-import { gql } from '@apollo/client';
+import { gql } from 'graphql-request';
 
 export const LIST_EMPLOYEES = gql`
-  query ListEmployees($page: Int, $pageSize: Int, $filter: String) {
-    listEmployees(page: $page, pageSize: $pageSize, filter: $filter) 
-    @connection(key: "employees", filter: ["filter"]) {
+  query ListEmployees($page: Int, $filter: String) {
+    listEmployees(page: $page, filter: $filter) {
       employees {
         id
         first_name

@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';
+import { gql } from 'graphql-request';
 
 export const CREATE_EMPLOYEE = gql`
   mutation CreateNewEmployee($employee: EmployeeInput) {
