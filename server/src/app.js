@@ -16,7 +16,13 @@ async function main() {
     resolvers,
     context: {
       Employee
-    }
+    },
+    introspection: true,
+    playground: true,
+  });
+
+  app.get('/', (req, res) => {
+    res.send('Hello World !!!');
   });
 
   await knex.migrate.latest();
