@@ -1,5 +1,6 @@
 const axios = require('axios');
 const { v4: uuidv4 } = require('uuid');
+// const fs = require('fs').promises;
 
 const departments = ['IT', 'HR', 'Sales', 'Accounts', 'Software'];
 
@@ -45,11 +46,15 @@ function createEmployee(person) {
 
 async function fetchDummyData() {
   try {
-    console.log('--------------- Fetching Employess ---------------');
-    const { data } = await axios.get(
-      `https://fakerapi.it/api/v1/persons?_quantity=100`
-    );
-    return data.data.map(person => createEmployee(person));
+    // console.log('--------------- Fetching Employess ---------------');
+    // const { data } = await axios.get(
+    //   `https://fakerapi.it/api/v1/persons?_quantity=100`
+    // );
+    // return data.data.map(person => createEmployee(person));
+    const fs = require('fs').promises;
+
+    const data = await fs.readFile('./db/seeds/employees.json');
+    return JSON.parse(data.toString());
 
   } catch(error) {
     console.error(error);
@@ -68,7 +73,6 @@ exports.seed = function(knex) {
         
         const employees = await fetchDummyData();
 
-        console.log(employees.length);
         return knex('employee').insert(employees);
       } catch (error) {
         console.log(error);

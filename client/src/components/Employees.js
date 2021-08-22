@@ -15,11 +15,12 @@ import Header from './Header';
 import Modal from './Modal';
 import Pagination from './Pagination';
 import EmployeeForm from './EmployeeForm';
+import Spinner from './Spinner';
 
 import SearchBox from './SearchBox';
 import useDebounce from '../hooks/useDebouncedValue';
 
-const GRAHPHQL_URL = 'http://localhost:3131/graphql';
+const GRAHPHQL_URL = 'http://localhost:3030/graphql';
 
 function fetchEmployees({ queryKey }) {
   const [_, { page, debouncedQuery }] = queryKey;
@@ -137,7 +138,9 @@ function Employees() {
       />
       <div className="container mt-4">
         {isLoading ? (
-          <p>Loading...</p>
+          <div className="centered-spinner">
+            <Spinner />
+          </div>
         ) : (
           <>
             <SearchBox
