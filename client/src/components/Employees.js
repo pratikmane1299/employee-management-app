@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { request } from 'graphql-request';
 
@@ -23,7 +23,7 @@ import useDebounce from '../hooks/useDebouncedValue';
 const GRAHPHQL_URL = process.env.REACT_APP_SERVER_URL+'/graphql';
 
 function fetchEmployees({ queryKey }) {
-  const [_, { page, pageSize, debouncedQuery }] = queryKey;
+  const { page, pageSize, debouncedQuery } = queryKey[1];
   return request(
     GRAHPHQL_URL,
     LIST_EMPLOYEES, {

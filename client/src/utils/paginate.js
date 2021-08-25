@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 export default function paginate(totalItems, page = 1, pageSize = 10, maxPages = 10) {
   const totalPages = Math.ceil(totalItems / pageSize);
 
