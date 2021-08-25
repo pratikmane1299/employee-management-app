@@ -20,14 +20,15 @@ import Spinner from './Spinner';
 import SearchBox from './SearchBox';
 import useDebounce from '../hooks/useDebouncedValue';
 
-const GRAHPHQL_URL = 'http://localhost:3030/graphql';
+const GRAHPHQL_URL = process.env.REACT_APP_SERVER_URL+'/graphql';
 
 function fetchEmployees({ queryKey }) {
-  const [_, { page, debouncedQuery }] = queryKey;
+  const [_, { page, pageSize, debouncedQuery }] = queryKey;
   return request(
     GRAHPHQL_URL,
     LIST_EMPLOYEES, {
       page,
+      pageSize,
       filter: debouncedQuery,
     },
   );
@@ -35,7 +36,7 @@ function fetchEmployees({ queryKey }) {
 
 function Employees() {
   const [page, setPage] = useState(1);
-  const [pageSize] = useState(10);
+  const [pageSize] = useState(5);
   const [query, setQuery] = useState('');
   const [selectedEmployee, setSelectedEmployee] = useState({
     first_name: '',
@@ -55,7 +56,7 @@ function Employees() {
   const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery(
-    ['employees', { page, debouncedQuery }],
+    ['employees', { page, pageSize, debouncedQuery }],
     fetchEmployees
   );
 
@@ -169,151 +170,153 @@ function Employees() {
                 </button>
               </div>
             )}
-            <table className="table mt-4">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Mobile</th>
-                  <th>Gender</th>
-                  <th>Profile</th>
-                  <th>Department</th>
-                  <th>Salary</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.listEmployees.employees.map((employee) => (
-                  <tr key={employee.id}>
-                    <td>
-                      <div className="d-inline-flex align-items-center">
-                        <div className="profile-image-container">
-                          <img
-                            src={employee.image_url}
-                            alt={employee.first_name}
-                          />
-                        </div>
-                        <h6 className="ml-2">{`${employee.first_name} ${employee.last_name}`}</h6>
-                      </div>
-                    </td>
-                    <td>{employee.email}</td>
-                    <td>{employee.mobile}</td>
-                    <td>{employee.gender}</td>
-                    <td>{employee.job_profile}</td>
-                    <td>{employee.department}</td>
-                    <td>&#8377; {employee.salary}</td>
-                    <td>
-                      <button className="btn btn-success btn-sm mr-1">
-                        <FontAwesomeIcon
-                          icon={faPen}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            setMode('edit');
-                            setShowModal(true);
-                            setSelectedEmployee(employee);
-                          }}
-                        />
-                      </button>
-                      <button className="btn btn-danger btn-sm ml-1">
-                        <FontAwesomeIcon icon={faTrashAlt} onClick={(e) => {
-                          e.preventDefault();
-                          handleOnDelete(employee.id);
-                        }} />
-                      </button>
-                    </td>
+            <div className="table-responsive-lg">
+              <table className="table mt-4">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Mobile</th>
+                    <th>Gender</th>
+                    <th>Profile</th>
+                    <th>Department</th>
+                    <th>Salary</th>
+                    <th>Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-            <Pagination
-              className="pagination-wrapper"
-              currentPage={page}
-              pageSize={pageSize}
-              totalItems={data.listEmployees.total}
-            >
-              {({
-                pages,
-                previousPage,
-                nextPage,
-                hasPreviousPage,
-                hasNextPage,
-                totalPages,
-              }) => (
-                <ul className="pagination">
-                  <li className="pagination-meta">
-                    Page {page} of {totalPages}
-                  </li>
-                  {hasPreviousPage && (
-                    <>
-                      <li className="page-item pagination-first">
-                        <button
-                          className="page-link"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            setPage(1);
-                          }}
-                        >
-                          First
+                </thead>
+                <tbody>
+                  {data.listEmployees.employees.map((employee) => (
+                    <tr key={employee.id}>
+                      <td>
+                        <div className="d-inline-flex align-items-center">
+                          <div className="profile-image-container">
+                            <img
+                              src={employee.image_url}
+                              alt={employee.first_name}
+                            />
+                          </div>
+                          <h6 className="ml-2">{`${employee.first_name} ${employee.last_name}`}</h6>
+                        </div>
+                      </td>
+                      <td>{employee.email}</td>
+                      <td>{employee.mobile}</td>
+                      <td>{employee.gender}</td>
+                      <td>{employee.job_profile}</td>
+                      <td>{employee.department}</td>
+                      <td>&#8377; {employee.salary}</td>
+                      <td>
+                        <button className="btn btn-success btn-sm mr-1">
+                          <FontAwesomeIcon
+                            icon={faPen}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setMode('edit');
+                              setShowModal(true);
+                              setSelectedEmployee(employee);
+                            }}
+                          />
                         </button>
-                      </li>
-                      <li className="page-item pagination-prev">
-                        <button
-                          className="page-link"
-                          onClick={(e) => {
+                        <button className="btn btn-danger btn-sm ml-1">
+                          <FontAwesomeIcon icon={faTrashAlt} onClick={(e) => {
                             e.preventDefault();
-                            setPage(previousPage);
-                          }}
-                        >
-                          &#8592;&nbsp;Previous
+                            handleOnDelete(employee.id);
+                          }} />
                         </button>
-                      </li>
-                    </>
-                  )}
-                  {pages.map((p) => (
-                    <li
-                      key={p}
-                      className={p === page ? "page-item active" : "page-item"}
-                    >
-                      <button
-                        className="page-link"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setPage(p);
-                        }}
-                      >
-                        {p}
-                      </button>
-                    </li>
+                      </td>
+                    </tr>
                   ))}
-                  {hasNextPage && (
-                    <>
-                      <li className="page-item pagination-first">
+                </tbody>
+              </table>
+              <Pagination
+                className="pagination-wrapper"
+                currentPage={page}
+                pageSize={pageSize}
+                totalItems={data.listEmployees.total}
+              >
+                {({
+                  pages,
+                  previousPage,
+                  nextPage,
+                  hasPreviousPage,
+                  hasNextPage,
+                  totalPages,
+                }) => (
+                  <ul className="pagination">
+                    <li className="pagination-meta">
+                      Page {page} of {totalPages}
+                    </li>
+                    {hasPreviousPage && (
+                      <>
+                        <li className="page-item pagination-first">
+                          <button
+                            className="page-link"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setPage(1);
+                            }}
+                          >
+                            First
+                          </button>
+                        </li>
+                        <li className="page-item pagination-prev">
+                          <button
+                            className="page-link"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setPage(previousPage);
+                            }}
+                          >
+                            &#8592;&nbsp;Previous
+                          </button>
+                        </li>
+                      </>
+                    )}
+                    {pages.map((p) => (
+                      <li
+                        key={p}
+                        className={p === page ? "page-item active" : "page-item"}
+                      >
                         <button
                           className="page-link"
                           onClick={(e) => {
                             e.preventDefault();
-                            setPage(nextPage);
+                            setPage(p);
                           }}
                         >
-                          Next&nbsp;&#8594;
+                          {p}
                         </button>
                       </li>
-                      <li className="page-item pagination-prev">
-                        <button
-                          className="page-link"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            setPage(totalPages);
-                          }}
-                        >
-                          Last
-                        </button>
-                      </li>
-                    </>
-                  )}
-                </ul>
-              )}
-            </Pagination>
+                    ))}
+                    {hasNextPage && (
+                      <>
+                        <li className="page-item pagination-first">
+                          <button
+                            className="page-link"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setPage(nextPage);
+                            }}
+                          >
+                            Next&nbsp;&#8594;
+                          </button>
+                        </li>
+                        <li className="page-item pagination-prev">
+                          <button
+                            className="page-link"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setPage(totalPages);
+                            }}
+                          >
+                            Last
+                          </button>
+                        </li>
+                      </>
+                    )}
+                  </ul>
+                )}
+              </Pagination>
+            </div>
           </>
         )}
         <Modal show={showModal}>
