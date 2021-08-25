@@ -30,7 +30,13 @@
   npm install
 ```
 
-3. Run the application
+3. Setup environment variables
+
+  Create .env in client & server directories and copy variables from respective .env.sample file.
+
+  > Use DATABASE_URL variable only for production database connection string.
+
+4. Run the application
 
   * Start graphql server
   ```sh
