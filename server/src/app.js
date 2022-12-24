@@ -28,7 +28,7 @@ async function main() {
   await knex.migrate.latest();
 
   // Uncomment to pre populate dummy data...
-  // await knex.seed.run();
+  await knex.seed.run();
 
   graphqlServer.applyMiddleware({ app });
 
